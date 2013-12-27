@@ -3,12 +3,14 @@
 
 #include "TypeDescriptorBase.h"
 
+//The base class for every garbage collected class.
 class GObject
 {
 private:
-	TypeDescriptorBae* _tag; //pointer to the typedescriptor
+	TypeDescriptorBase* _tag; //pointer to the typedescriptor
 	int _mark;
 	int _free;
+
 	friend Heap;
 
 public:
@@ -16,7 +18,6 @@ public:
 	{
 		_mark = 0;
 		_free = 0;
-
 		_tag = NULL;
 	}
 };

@@ -1,35 +1,40 @@
 #include "Heap.h"
 #include <iostream>
 #include "TestClass.h"
-#include "TestClassDescriptor.cpp"
 
 void* Heap::_listStart = malloc(Heap::LISTSIZE);
 FreeBlock* Heap::_firstFree;
-map<std::string, TypeDescriptorBae>  Heap::_descriptors;
-//map<std::string, TypeDescriptorBae*> Heap::_descriptors = new map<std::string, TypeDescriptorBae*>();
-
+map<std::string, TypeDescriptorBase>  Heap::_descriptors;
 
 Heap::Heap()
 {
 }
 
-
 Heap::~Heap()
 {
 }
 
-
-
-void* Heap::alloc(std::string cName)
+void* Heap::alloc(std::string CName)
 {		
-	//_firstFree = _listStart;
+	if (!_descriptors.count(CName))
+	{
+		throw "Typedescriptor for the given class is not registered";
+	}
 
-	return _listStart;
+	auto descriptor = _descriptors[CName];
+
+	auto objStart =  alloc(descriptor.GetObjectSize());
+	
+	((GObject*)objStart)->_free = 0;
+	((GObject*)objStart)->_mark = 0;
+	((GObject*)objStart)->_tag = &descriptor;
+		
+	return objStart;
 }
 
 void* Heap::addTestObj()
 {
-	auto retObject = (TestClass*)Alloc(sizeof(TestClass));
+	auto retObject = (TestClass*)alloc(sizeof(TestClass));
 	retObject->_free = 0;
 	retObject->_mark = 0;
 
@@ -41,12 +46,9 @@ void* Heap::addTestObj()
 }
 
 
+//Initialization of the heap. After this method the heap is 1 big free block.
 void Heap::initHeap()
 {	
-	TestClassDescriptor d;
-	std::string s("TestClassDescriptor");
-	_descriptors.insert(std::pair<std::string, TypeDescriptorBae>(s, d));
-
 	FreeBlock fb;
 	
 	auto blockInfoSize = sizeof(fb.lfb) + sizeof(fb.length) + sizeof(fb.next);
@@ -58,21 +60,12 @@ void Heap::initHeap()
 	_firstFree = (FreeBlock*)_listStart;
 }
 
+//Puts a freeblock at location contained by the startbit parameter and sets all the bytes to zero
 void Heap::putFreeBlock(void* startBit, FreeBlock fb)
 {
-	*(int*)startBit = fb.lfb;	
-	
+	*(int*)startBit = fb.lfb;		
 	*((int*) (startBit) +1) = fb.length;
-	//* ((int *)startBit + sizeof(int)) = fb.length;
-	
-	//auto addr = (FreeBlock*)((int*)(startBit)+2);
-
-
-
 	*((int*)(startBit)+2) = (int)fb.next;
-
-
-	
 
 	void* startData = (FreeBlock**) ((int*)startBit + 2) + 1; 
 
@@ -92,20 +85,9 @@ void Heap::dump()
 	cout << "dump finished"<<endl;
 }
 
-
-//Returns the address of the first free block. The reutrned pointer points to the first bit including the header infos)
-//void* Heap::FirstFitAddress()
-//{
-//	return NULL;
-//}
-
-void* Heap::testAddMethod()
-{
-
-	return 0;
-}
-
-void* Heap::Alloc(int Size)
+//Allocates a block of memory with size Size and returns the beginning of the block 
+//(the returned address is the address after the leading 1 which marks that it is a use block)
+void* Heap::alloc(int Size)
 {
 	FreeBlock* free = (FreeBlock*)_firstFree;
 	FreeBlock* prev = free;
@@ -132,4 +114,9 @@ void* Heap::Alloc(int Size)
 
 		return (int*)startOfTheNewBlock+1;
 	}
+}
+
+void Heap::registerType(std::string Key, TypeDescriptorBase &Decriptor)
+{
+	_descriptors.insert(std::pair<std::string, TypeDescriptorBase>(Key, Decriptor));
 }

@@ -8,6 +8,5 @@ public:
 
 	const int lfb = 0;
 	int length; //stores the length of the free block
-	FreeBlock* next;
-	
+	FreeBlock* next;	
 };

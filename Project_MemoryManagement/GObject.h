@@ -1,6 +1,6 @@
 #pragma once
-#include "Heap.h"
 
+#include "Heap.h"
 #include "TypeDescriptorBase.h"
 
 //The base class for every garbage collected class.
@@ -11,9 +11,8 @@ private:
 	int _mark;
 	int _free;
 
-	friend Heap;
-
 public:
+	friend class Heap;
 	GObject()
 	{
 		_mark = 0;

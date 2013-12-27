@@ -4,7 +4,7 @@
 
 void* Heap::_listStart = malloc(Heap::LISTSIZE);
 FreeBlock* Heap::_firstFree;
-map<std::string, TypeDescriptorBase>  Heap::_descriptors;
+map<std::string, TypeDescriptorBase*>  Heap::_descriptors;
 
 Heap::Heap()
 {
@@ -23,11 +23,13 @@ void* Heap::alloc(std::string CName)
 
 	auto descriptor = _descriptors[CName];
 
-	auto objStart =  alloc(descriptor.GetObjectSize());
+	auto objStart =  alloc(descriptor->GetObjectSize());
 	
 	((GObject*)objStart)->_free = 0;
 	((GObject*)objStart)->_mark = 0;
-	((GObject*)objStart)->_tag = &descriptor;
+	((GObject*)objStart)->_tag = descriptor;
+
+	//TODO set the pointers to NULL!
 		
 	return objStart;
 }
@@ -40,7 +42,7 @@ void* Heap::addTestObj()
 
 	auto tcdesc = _descriptors["TestClassDescriptor"];
 
-	retObject->_tag = &tcdesc;
+	retObject->_tag = tcdesc;
 
 	return retObject;
 }
@@ -116,7 +118,29 @@ void* Heap::alloc(int Size)
 	}
 }
 
-void Heap::registerType(std::string Key, TypeDescriptorBase &Decriptor)
+void Heap::registerType(std::string Key, TypeDescriptorBase *Decriptor)
 {
-	_descriptors.insert(std::pair<std::string, TypeDescriptorBase>(Key, Decriptor));
+	_descriptors.insert(std::pair<std::string, TypeDescriptorBase*>(Key, Decriptor));
+}
+
+void Heap::markNaive(GObject* Block)
+{
+	if (Block != NULL && !Block->_mark)
+	{
+		Block->_mark = 1;
+				
+		auto offsetVector = Block->_tag->GetOffsetList();	
+		for each (auto offsetItem in  *offsetVector) 
+		{
+			markNaive(*(GObject**)((char*)(Block)+sizeof(GObject)+offsetItem));
+		}		
+	}
+}
+
+void Heap::gc(std::vector<GObject*> roots)
+{
+	for each (auto rootObject in roots)
+	{
+		markNaive(rootObject);
+	}
 }

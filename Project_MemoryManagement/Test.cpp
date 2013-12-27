@@ -8,8 +8,8 @@
 void InitHeapWithDescriptors()
 {
 	Heap::initHeap();
-	TestClassDescriptor descriptor(sizeof(TestClass), "TestClass");
-	Heap::registerType(descriptor.GetClassName(), descriptor);
+	TestClassDescriptor* descriptor = new TestClassDescriptor(sizeof(TestClass), "TestClass");
+	Heap::registerType(descriptor->GetClassName(), descriptor);
 }
 
 int main()
@@ -43,8 +43,17 @@ int main()
 	r2->tp->intField = 21;
 
 	ro->intField = 3;
-	ro->tp = new TestClass();
 	
+	
+	Heap::dump();
+
+	std::vector<GObject*> roots;
+	
+	roots.push_back(ro);
+	roots.push_back(r2);
+	
+	Heap::gc(roots);
+
 	Heap::dump();
 
 	std::cin.get();

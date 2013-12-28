@@ -47,7 +47,6 @@ void* Heap::addTestObj()
 	return retObject;
 }
 
-
 //Initialization of the heap. After this method the heap is 1 big free block.
 void Heap::initHeap()
 {	
@@ -60,6 +59,29 @@ void Heap::initHeap()
 
 	putFreeBlock(Heap::_listStart, fb);
 	_firstFree = (FreeBlock*)_listStart;
+}
+
+int* Heap::FindNextBlock(int* BlockStart)
+{
+	int size;
+	if (*BlockStart == 1)
+	{
+		size = ((GObject*)((int*)BlockStart + 1))->_tag->GetObjectSize() + sizeof(int);
+	}
+	else
+	{
+		size = ((FreeBlock*)BlockStart)->length + sizeof(int) + sizeof(int) + sizeof(FreeBlock*);
+	}
+
+	void* nextStart = ((char*)BlockStart + size);
+	if (nextStart < (char*)_listStart + LISTSIZE)
+	{		
+		return (int*)nextStart;
+	}
+	else
+	{
+		return NULL;
+	}
 }
 
 //Puts a freeblock at location contained by the startbit parameter and sets all the bytes to zero
@@ -79,11 +101,26 @@ void Heap::putFreeBlock(void* startBit, FreeBlock fb)
 
 void Heap::dump()
 {
-	for (size_t i = 0; i < 20; i++)
-	{
-		cout << *((int*)Heap::_listStart + i) << endl;
-	}
+	//for (size_t i = 0; i < 20; i++)
+	//{
+	//	cout << *((int*)Heap::_listStart + i) << endl;
+	//}
 
+	int* actItem = (int*)_listStart;
+	while (actItem != NULL)
+	{
+		if (*actItem == 0)
+		{
+			cout << "free block" << endl << "size: " << ((FreeBlock*)actItem)->length<<endl;
+		}
+		else
+		{
+			cout << "used block: " << endl << "class: " << ((GObject*)((int*)actItem + 1))->_tag->GetClassName() << endl << "size: "<< ((GObject*)((int*)actItem + 1))->_tag->GetObjectSize() << endl;
+		}
+
+		actItem = FindNextBlock(actItem);
+	}
+	
 	cout << "dump finished"<<endl;
 }
 
@@ -123,6 +160,23 @@ void Heap::registerType(std::string Key, TypeDescriptorBase *Decriptor)
 	_descriptors.insert(std::pair<std::string, TypeDescriptorBase*>(Key, Decriptor));
 }
 
+void Heap::dealloc(GObject* obj)
+{
+	//TODO check if left nb is freeblock, if it is a freeblock merge with the deallocated block
+	//Do the same for the right nb
+
+	*((int*)obj - 1) = 0;
+
+	auto objSize = obj->_tag->GetObjectSize();
+
+	for (size_t i = 0; i < objSize; i++)
+	{
+		*((char*)(obj)+i) = 0;
+	}
+
+
+}
+
 void Heap::markNaive(GObject* Block)
 {
 	if (Block != NULL && !Block->_mark)
@@ -142,5 +196,36 @@ void Heap::gc(std::vector<GObject*> roots)
 	for each (auto rootObject in roots)
 	{
 		markNaive(rootObject);
+	}
+
+//	sweep();
+}
+
+void Heap::sweep()
+{
+	auto aktObj = findFirstObjectStart();
+
+	while ((char*)aktObj < (char*)_listStart + LISTSIZE)
+	{
+		if (aktObj->_mark == 1)
+		{
+			aktObj->_mark = 0;
+		}
+		else
+		{
+			dealloc(aktObj);
+		}
+		//TODO jump to the next block
+	}
+}
+
+GObject* Heap::findFirstObjectStart()
+{
+	for (size_t i = 0; i < LISTSIZE; i++)
+	{
+		if (*(int*)((char*)_listStart + i) == 1)
+		{
+			return (GObject*)((char*)_listStart + i + sizeof(int));
+		}
 	}
 }

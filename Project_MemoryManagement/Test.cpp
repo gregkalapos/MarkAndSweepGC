@@ -40,8 +40,7 @@ int main()
 	r2->intField = 11;
 	r2->tp = ro;
 
-	r2->tp->intField = 21;
-
+	
 	ro->intField = 3;
 	
 	
@@ -50,7 +49,7 @@ int main()
 	std::vector<GObject*> roots;
 	
 	roots.push_back(ro);
-	roots.push_back(r2);
+	//roots.push_back();
 	
 	Heap::gc(roots);
 

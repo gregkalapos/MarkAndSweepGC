@@ -23,7 +23,11 @@ private:
 
 	static void* alloc(int Size);//Finds the next free block and allocates space for the new object and returns the beginning of the block
 	static void markNaive(GObject* Block);
-	
+	static void sweep();
+	static GObject* findFirstObjectStart(); //returns the starting byte of the first object in the list
+	static void dealloc(GObject* obj);
+	static int* FindNextBlock(int* BlockStart);
+
 	Heap();	
 
 public:

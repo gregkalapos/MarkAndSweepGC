@@ -27,6 +27,7 @@ private:
 	static GObject* findFirstObjectStart(); //returns the starting byte of the first object in the list
 	static void dealloc(GObject* obj);
 	static int* FindNextBlock(int* BlockStart);
+	static FreeBlock* findFreeBlockBefore(GObject* object);
 
 	Heap();	
 
@@ -34,6 +35,7 @@ public:
 	static void initHeap();
 	static void* alloc(std::string CName);
 	static void dump();
+	static void intDump();
 	~Heap();
 
 	static void* addTestObj();

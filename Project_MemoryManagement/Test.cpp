@@ -51,6 +51,15 @@ int main()
 	roots.push_back(ro);
 	//roots.push_back();
 	
+	//Heap::gc(roots);
+
+	Heap::dump();
+
+	Heap::gc(roots);
+	Heap::dump();
+
+
+	roots.clear();
 	Heap::gc(roots);
 
 	Heap::dump();

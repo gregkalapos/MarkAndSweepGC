@@ -101,10 +101,7 @@ void Heap::putFreeBlock(void* startBit, FreeBlock fb)
 
 void Heap::dump()
 {
-	//for (size_t i = 0; i < 20; i++)
-	//{
-	//	cout << *((int*)Heap::_listStart + i) << endl;
-	//}
+	cout << "==========Start Dump============" << endl;
 
 	int* actItem = (int*)_listStart;
 	while (actItem != NULL)
@@ -121,7 +118,8 @@ void Heap::dump()
 		actItem = FindNextBlock(actItem);
 	}
 	
-	cout << "dump finished"<<endl;
+	cout << "==========Dump finished============" << endl <<endl <<endl;
+	
 }
 
 //Allocates a block of memory with size Size and returns the beginning of the block 
@@ -165,16 +163,85 @@ void Heap::dealloc(GObject* obj)
 	//TODO check if left nb is freeblock, if it is a freeblock merge with the deallocated block
 	//Do the same for the right nb
 
-	*((int*)obj - 1) = 0;
+	int* actPos = (int*)_listStart;	
+	int* posBefore = NULL;
 
-	auto objSize = obj->_tag->GetObjectSize();
-
-	for (size_t i = 0; i < objSize; i++)
+	while ((char*)actPos != (char*)((int*)obj-1))
 	{
-		*((char*)(obj)+i) = 0;
+		posBefore = (int*)actPos;
+		actPos = FindNextBlock(actPos);
 	}
 
+	int* posAfter = FindNextBlock((int*)obj - 1);
 
+	FreeBlock* newFb; //stores a reference to the freeblock which will be processed
+
+	//process the leftnb
+	if (*posBefore == 0)
+	{
+		((FreeBlock*)(posBefore))->length += ((GObject*)obj)->_tag->GetObjectSize() + sizeof(1);
+		
+		newFb = (FreeBlock*)posBefore;
+
+		*((int*)obj - 1) = 0;
+		auto objSize = obj->_tag->GetObjectSize();
+		for (size_t i = 0; i < objSize; i++)
+		{
+			*((char*)obj + i) = 0;
+		}
+	}
+	else
+	{
+		FreeBlock* lastFreeNb = findFreeBlockBefore(obj);
+
+		FreeBlock fb(obj->_tag->GetObjectSize() + sizeof(int));
+		fb.next = lastFreeNb->next;		
+		putFreeBlock(((int*)obj - 1), fb);
+		lastFreeNb->next = (FreeBlock*)((int*)obj - 1);
+		newFb = (FreeBlock*)((int*)obj - 1);
+	}
+
+	//process the rnb
+	if (posAfter!= NULL && *posAfter == 0)
+	{
+		newFb->next = ((FreeBlock*)posAfter)->next;
+		newFb->length += ( ((FreeBlock*)posAfter)->length + sizeof(((FreeBlock*)posAfter)->length) +
+			sizeof(((FreeBlock*)posAfter)->lfb) + sizeof(((FreeBlock*)posAfter)->next) );
+
+		((FreeBlock*)posAfter)->length = 0;
+		((FreeBlock*)posAfter)->next = 0;		
+	}
+
+	//*((int*)obj - 1) = 0;
+	//auto objSize = obj->_tag->GetObjectSize();
+	//for (size_t i = 0; i < objSize; i++)
+	//{
+	//	*((char*)(obj)+i) = 0;
+	//}
+}
+
+
+void Heap::intDump()
+{
+	for (size_t i = 0; i < 20; i++)
+	{
+		cout << *((int*)Heap::_listStart + i) << endl;
+	}
+}
+
+
+FreeBlock* Heap::findFreeBlockBefore(GObject* object)
+{
+	FreeBlock* next = _firstFree->next;
+	FreeBlock* lastNext = _firstFree;
+
+	while (next != _firstFree && (char*)next < (char*)object)
+	{
+		lastNext = next;
+		next = next->next;
+	}
+
+	return lastNext;
 }
 
 void Heap::markNaive(GObject* Block)
@@ -198,15 +265,25 @@ void Heap::gc(std::vector<GObject*> roots)
 		markNaive(rootObject);
 	}
 
-//	sweep();
+	sweep();
 }
 
 void Heap::sweep()
 {
 	auto aktObj = findFirstObjectStart();
 
-	while ((char*)aktObj < (char*)_listStart + LISTSIZE)
+	if (aktObj == NULL)
 	{
+		return;
+	}
+
+	bool isFinished = false;
+
+
+	while (!isFinished)
+	{
+		int* n = FindNextBlock((int*)aktObj - 1);
+
 		if (aktObj->_mark == 1)
 		{
 			aktObj->_mark = 0;
@@ -215,7 +292,17 @@ void Heap::sweep()
 		{
 			dealloc(aktObj);
 		}
-		//TODO jump to the next block
+
+
+		while (n != NULL && *n != 1)
+		{
+			n = FindNextBlock(n);
+		}
+
+		if (n == NULL)
+			isFinished = true;
+		else
+			aktObj = (GObject*)(n+1);
 	}
 }
 
@@ -228,4 +315,5 @@ GObject* Heap::findFirstObjectStart()
 			return (GObject*)((char*)_listStart + i + sizeof(int));
 		}
 	}
+	return NULL;
 }

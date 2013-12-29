@@ -108,15 +108,27 @@ void Heap::dump()
 	{
 		if (*actItem == 0)
 		{
-			cout << "free block" << endl << "size: " << ((FreeBlock*)actItem)->length<<endl;
+			cout << "free block" << endl << "length: " << ((FreeBlock*)actItem)->length << endl << "address: " << &*((FreeBlock*)actItem) << endl << endl;
 		}
 		else
 		{
-			cout << "used block: " << endl << "class: " << ((GObject*)((int*)actItem + 1))->_tag->GetClassName() << endl << "size: "<< ((GObject*)((int*)actItem + 1))->_tag->GetObjectSize() << endl;
+			cout << "used block: " << endl << "class: " << ((GObject*)((int*)actItem + 1))->_tag->GetClassName() << endl << "address: " << &*(GObject*)((int*)actItem + 1) << endl << "size: " << ((GObject*)((int*)actItem + 1))->_tag->GetObjectSize() << endl << endl;
 		}
 
 		actItem = FindNextBlock(actItem);
 	}
+
+	cout << endl;
+
+	FreeBlock* next = _firstFree->next;
+	int FreeSize = _firstFree->length + sizeof(_firstFree->length) +  sizeof(_firstFree->next);
+	while (next != _firstFree)
+	{
+		FreeSize += (next->length + sizeof(next->length) + sizeof(next->next));
+		next = next->next;
+	}
+
+	cout << "Free space: " << FreeSize << endl;
 	
 	cout << "==========Dump finished============" << endl <<endl <<endl;
 	
@@ -228,7 +240,6 @@ void Heap::intDump()
 		cout << *((int*)Heap::_listStart + i) << endl;
 	}
 }
-
 
 FreeBlock* Heap::findFreeBlockBefore(GObject* object)
 {

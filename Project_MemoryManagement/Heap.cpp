@@ -135,9 +135,13 @@ void Heap::dump()
 }
 
 //Allocates a block of memory with size Size and returns the beginning of the block 
-//(the returned address is the address after the leading 1 which marks that it is a use block)
+//(the returned address is the address after the leading 1 which marks that it is a used block)
 void* Heap::alloc(int Size)
 {
+	if (!_firstFree)
+	{
+		return NULL;
+	}
 	FreeBlock* free = (FreeBlock*)_firstFree;
 	FreeBlock* prev = free;
 
@@ -159,7 +163,21 @@ void* Heap::alloc(int Size)
 	
 		void* startOfTheNewBlock = ((char*)free + sizeof(free->length) + sizeof(free->lfb) + sizeof(free->next) + free->length) - (Size + headerSize) ;
 		*(int*)startOfTheNewBlock = 1;
-		b->length = b->length - (Size)-headerSize;
+		
+		auto newLength = b->length - (Size)-headerSize;
+
+		if (free->length >= Size+headerSize) //if we can split the block... the next pointer remains the same!
+		{
+			free->length = newLength;
+		}
+		else if(free == prev) //last free block
+		{
+			_firstFree = NULL;
+		}
+		else //remove block from the list
+		{
+			prev->next = free->next;
+		}
 
 		return (int*)startOfTheNewBlock+1;
 	}

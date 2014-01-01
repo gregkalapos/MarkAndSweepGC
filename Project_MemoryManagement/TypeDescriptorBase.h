@@ -28,7 +28,14 @@ public:
 	}
 
 	TypeDescriptorBase()
-	{}
+	{
+	}
+
+
+	TypeDescriptorBase(std::string CName) : _className(CName)
+	{
+
+	}
 
 	TypeDescriptorBase(int Size, std::string CName) : _size(Size), _className(CName)
 	{

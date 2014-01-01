@@ -13,7 +13,7 @@ class GObject;
 class Heap
 {
 private:
-	static const int LISTSIZE = 80; // 32000;
+	static const int LISTSIZE = 300;//32000; // 80 ;
 
 	static void* _listStart; //pointer to the start of the list
 	static FreeBlock* _firstFree; //pointer to the first free block

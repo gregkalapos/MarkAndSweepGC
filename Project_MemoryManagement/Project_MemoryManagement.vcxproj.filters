@@ -16,6 +16,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="UserCode">
+      <UniqueIdentifier>{8144b908-2f3b-44e6-984c-18b2e6055f63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UserCode\TypeDescriptors">
+      <UniqueIdentifier>{5de6d5a4-2453-4a30-9fe2-870c89e8ddf7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -36,6 +42,24 @@
     <ClCompile Include="TypeDescriptorBase.h">
       <Filter>Source Files\TypeDescriptors</Filter>
     </ClCompile>
+    <ClCompile Include="Student.cpp">
+      <Filter>UserCode</Filter>
+    </ClCompile>
+    <ClCompile Include="StudentNode.cpp">
+      <Filter>UserCode</Filter>
+    </ClCompile>
+    <ClCompile Include="StudentList.cpp">
+      <Filter>UserCode</Filter>
+    </ClCompile>
+    <ClCompile Include="Lecture.cpp">
+      <Filter>UserCode</Filter>
+    </ClCompile>
+    <ClCompile Include="LectureNode.cpp">
+      <Filter>UserCode</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>UserCode</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Heap.h">
@@ -49,6 +73,36 @@
     </ClInclude>
     <ClInclude Include="GObject.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Student.h">
+      <Filter>UserCode</Filter>
+    </ClInclude>
+    <ClInclude Include="StudentTypeDescriptor.h">
+      <Filter>UserCode\TypeDescriptors</Filter>
+    </ClInclude>
+    <ClInclude Include="StudentNode.h">
+      <Filter>UserCode</Filter>
+    </ClInclude>
+    <ClInclude Include="StudentList.h">
+      <Filter>UserCode</Filter>
+    </ClInclude>
+    <ClInclude Include="Lecture.h">
+      <Filter>UserCode</Filter>
+    </ClInclude>
+    <ClInclude Include="LectureNode.h">
+      <Filter>UserCode</Filter>
+    </ClInclude>
+    <ClInclude Include="LectureTypeDescriptor.h">
+      <Filter>UserCode\TypeDescriptors</Filter>
+    </ClInclude>
+    <ClInclude Include="LectureNodeTypeDescriptor.h">
+      <Filter>UserCode\TypeDescriptors</Filter>
+    </ClInclude>
+    <ClInclude Include="StudentListTypeDescriptor.h">
+      <Filter>UserCode\TypeDescriptors</Filter>
+    </ClInclude>
+    <ClInclude Include="StudentNodeTypeDescriptor.h">
+      <Filter>UserCode\TypeDescriptors</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

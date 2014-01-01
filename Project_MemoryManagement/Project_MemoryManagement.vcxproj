@@ -66,6 +66,12 @@
   <ItemGroup>
     <ClCompile Include="FreeBlock.cpp" />
     <ClCompile Include="Heap.cpp" />
+    <ClCompile Include="Lecture.cpp" />
+    <ClCompile Include="LectureNode.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Student.cpp" />
+    <ClCompile Include="StudentList.cpp" />
+    <ClCompile Include="StudentNode.cpp" />
     <ClCompile Include="Test.cpp" />
     <ClCompile Include="TestClass.cpp" />
     <ClCompile Include="TestClassDescriptor.cpp" />
@@ -75,6 +81,16 @@
     <ClInclude Include="FreeBlock.h" />
     <ClInclude Include="GObject.h" />
     <ClInclude Include="Heap.h" />
+    <ClInclude Include="Lecture.h" />
+    <ClInclude Include="LectureNode.h" />
+    <ClInclude Include="LectureNodeTypeDescriptor.h" />
+    <ClInclude Include="LectureTypeDescriptor.h" />
+    <ClInclude Include="Student.h" />
+    <ClInclude Include="StudentList.h" />
+    <ClInclude Include="StudentListTypeDescriptor.h" />
+    <ClInclude Include="StudentNode.h" />
+    <ClInclude Include="StudentNodeTypeDescriptor.h" />
+    <ClInclude Include="StudentTypeDescriptor.h" />
     <ClInclude Include="TestClass.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

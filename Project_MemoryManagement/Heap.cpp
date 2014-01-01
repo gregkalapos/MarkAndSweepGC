@@ -24,7 +24,12 @@ void* Heap::alloc(std::string CName)
 	auto descriptor = _descriptors[CName];
 
 	auto objStart =  alloc(descriptor->GetObjectSize());
-	
+
+	if (!objStart)
+	{
+		return NULL;
+	}
+
 	((GObject*)objStart)->_free = 0;
 	((GObject*)objStart)->_mark = 0;
 	((GObject*)objStart)->_tag = descriptor;
@@ -253,7 +258,7 @@ void Heap::dealloc(GObject* obj)
 
 void Heap::intDump()
 {
-	for (size_t i = 0; i < 20; i++)
+	for (size_t i = 0; i < (LISTSIZE/4); i++)
 	{
 		cout << *((int*)Heap::_listStart + i) << endl;
 	}

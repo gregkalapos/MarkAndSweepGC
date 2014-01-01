@@ -195,9 +195,6 @@ void Heap::registerType(std::string Key, TypeDescriptorBase *Decriptor)
 
 void Heap::dealloc(GObject* obj)
 {
-	//TODO check if left nb is freeblock, if it is a freeblock merge with the deallocated block
-	//Do the same for the right nb
-
 	int* actPos = (int*)_listStart;	
 	int* posBefore = NULL;
 
@@ -229,7 +226,7 @@ void Heap::dealloc(GObject* obj)
 	{
 		FreeBlock* lastFreeNb = findFreeBlockBefore(obj);
 
-		FreeBlock fb(obj->_tag->GetObjectSize() + sizeof(int));
+		FreeBlock fb(obj->_tag->GetObjectSize() + sizeof(int) - sizeof(int) - sizeof(int) - sizeof(FreeBlock*) );
 		fb.next = lastFreeNb->next;		
 		putFreeBlock(((int*)obj - 1), fb);
 		lastFreeNb->next = (FreeBlock*)((int*)obj - 1);
@@ -254,7 +251,6 @@ void Heap::dealloc(GObject* obj)
 	//	*((char*)(obj)+i) = 0;
 	//}
 }
-
 
 void Heap::intDump()
 {
@@ -305,19 +301,29 @@ void Heap::gc(std::vector<GObject*> roots)
 void Heap::sweep()
 {
 	auto aktObj = findFirstObjectStart();
+	GObject* nextObject = NULL;
 
 	if (aktObj == NULL)
 	{
 		return;
 	}
 
+	int* n = ((int*)aktObj - 1);
 	bool isFinished = false;
 
-
 	while (!isFinished)
-	{
-		int* n = FindNextBlock((int*)aktObj - 1);
+	{	
+		n = ((int*)aktObj - 1);
+		do
+		{		
+			n = FindNextBlock(n);
+		} while (n != NULL && *n != 1);
 
+		if (n == NULL)
+			isFinished = true;
+		else
+			nextObject = (GObject*)(n + 1);
+		
 		if (aktObj->_mark == 1)
 		{
 			aktObj->_mark = 0;
@@ -327,16 +333,7 @@ void Heap::sweep()
 			dealloc(aktObj);
 		}
 
-
-		while (n != NULL && *n != 1)
-		{
-			n = FindNextBlock(n);
-		}
-
-		if (n == NULL)
-			isFinished = true;
-		else
-			aktObj = (GObject*)(n+1);
+		aktObj = nextObject;
 	}
 }
 

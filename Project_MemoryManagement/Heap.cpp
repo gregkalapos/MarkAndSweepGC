@@ -335,7 +335,6 @@ void Heap::sweep()
 	}
 }
 
-
 void Heap::mark(GObject* Block)
 {
 	GObject* prev = NULL;
@@ -343,8 +342,29 @@ void Heap::mark(GObject* Block)
 
 	while (!done)
 	{
-		Block->_free++;
+		Block->_mark++;
+		if (Block->_mark < Block->_tag->GetOffsetList()->size())
+		{
+			GObject* p = *(GObject**) ((char*) (Block) +sizeof(GObject) + (Block->_tag->GetOffsetList()->at(Block->_mark))) ;
+			if (p != NULL && p->_mark < 0)
+			{
+				(*(GObject**) ((char*) (Block) +sizeof(GObject) +(Block->_tag->GetOffsetList()->at(Block->_mark)))) = prev;
+				prev = Block;
+				Block = p;
+			}
+		}
+		else
+		{
+			if (prev == NULL)
+			{
+				done = true; continue;
+			}
 
+			GObject* p = Block;
+			Block = prev;
+			prev = (*(GObject**) ((char*) (Block) +sizeof(GObject) +(Block->_tag->GetOffsetList()->at(Block->_mark))));
+			(*(GObject**) ((char*) (Block) +sizeof(GObject) +(Block->_tag->GetOffsetList()->at(Block->_mark)))) = p;
+		}
 	}
 }
 

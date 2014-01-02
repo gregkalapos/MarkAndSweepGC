@@ -31,10 +31,8 @@ void* Heap::alloc(std::string CName)
 	}
 
 	((GObject*)objStart)->_free = 0;
-	((GObject*)objStart)->_mark = 0;
+	((GObject*)objStart)->_mark = -1;
 	((GObject*)objStart)->_tag = descriptor;
-
-	//TODO set the pointers to NULL!
 		
 	return objStart;
 }
@@ -292,7 +290,7 @@ void Heap::gc(std::vector<GObject*> roots)
 {
 	for each (auto rootObject in roots)
 	{
-		markNaive(rootObject);
+		mark(rootObject);
 	}
 
 	sweep();
@@ -324,9 +322,9 @@ void Heap::sweep()
 		else
 			nextObject = (GObject*)(n + 1);
 		
-		if (aktObj->_mark == 1)
+		if (aktObj->_mark != -1)
 		{
-			aktObj->_mark = 0;
+			aktObj->_mark = -1;
 		}
 		else
 		{
@@ -334,6 +332,19 @@ void Heap::sweep()
 		}
 
 		aktObj = nextObject;
+	}
+}
+
+
+void Heap::mark(GObject* Block)
+{
+	GObject* prev = NULL;
+	bool done = false;
+
+	while (!done)
+	{
+		Block->_free++;
+
 	}
 }
 

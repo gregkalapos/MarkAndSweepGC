@@ -9,10 +9,10 @@ private:
 	StudentNode* _first;
 
 public:
-	StudentList(StudentNode* First);
+	StudentList();
 	~StudentList();
 
-	StudentNode* GetFirst();
-
+	void Add(Student* Student);
+	void Remove(Student* Student);
 };
 

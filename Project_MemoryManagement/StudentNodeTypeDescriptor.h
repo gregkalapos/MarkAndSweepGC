@@ -2,16 +2,22 @@
 
 #include "TypeDescriptorBase.h"
 #include <vector>
+#include "Student.h"
+#include "StudentNode.h"
 
 struct StudentNodeTypeDescriptor : public TypeDescriptorBase
 {
 
 public:
 
-	StudentNodeTypeDescriptor(int Size, std::string CName) :TypeDescriptorBase(Size, CName)
+	StudentNodeTypeDescriptor() :TypeDescriptorBase("StudentNode")
 	{
 		_offsetList = new std::vector<int>();
-		//_offsetList->push_back(sizeof(int)); //TODO
+
+		_offsetList->push_back(0);
+		_offsetList->push_back(sizeof(Student*));
+
+		_size = sizeof(StudentNode);
 	}
 
 

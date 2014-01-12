@@ -72,10 +72,6 @@
     <ClCompile Include="Student.cpp" />
     <ClCompile Include="StudentList.cpp" />
     <ClCompile Include="StudentNode.cpp" />
-    <ClCompile Include="Test.cpp" />
-    <ClCompile Include="TestClass.cpp" />
-    <ClCompile Include="TestClassDescriptor.cpp" />
-    <ClCompile Include="TypeDescriptorBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FreeBlock.h" />
@@ -91,7 +87,6 @@
     <ClInclude Include="StudentNode.h" />
     <ClInclude Include="StudentNodeTypeDescriptor.h" />
     <ClInclude Include="StudentTypeDescriptor.h" />
-    <ClInclude Include="TestClass.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

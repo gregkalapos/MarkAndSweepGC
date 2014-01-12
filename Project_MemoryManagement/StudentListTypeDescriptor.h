@@ -18,7 +18,6 @@ public:
 		_size = sizeof(StudentList);
 	}
 
-
 	/*
 	TestClassDescriptor();
 	~TestClassDescriptor();*/

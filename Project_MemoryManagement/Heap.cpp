@@ -30,7 +30,6 @@ void* Heap::alloc(std::string CName)
 		return NULL;
 	}
 
-	((GObject*)objStart)->_free = 0;
 	((GObject*)objStart)->_mark = -1;
 	((GObject*)objStart)->_tag = descriptor;
 		
@@ -39,8 +38,7 @@ void* Heap::alloc(std::string CName)
 
 void* Heap::addTestObj()
 {
-	auto retObject = (TestClass*)alloc(sizeof(TestClass));
-	retObject->_free = 0;
+	auto retObject = (TestClass*)alloc(sizeof(TestClass));	
 	retObject->_mark = 0;
 
 	auto tcdesc = _descriptors["TestClassDescriptor"];
@@ -115,7 +113,35 @@ void Heap::dump()
 		}
 		else
 		{
-			cout << "used block: " << endl << "class: " << ((GObject*)((int*)actItem + 1))->_tag->GetClassName() << endl << "address: " << &*(GObject*)((int*)actItem + 1) << endl << "size: " << ((GObject*)((int*)actItem + 1))->_tag->GetObjectSize() << endl << endl;
+			cout << "used block: " << endl << "class: " << ((GObject*) ((int*) actItem + 1))->_tag->GetClassName() << endl << "address: " << &*(GObject*) ((int*) actItem + 1) << endl << "size: " << ((GObject*) ((int*) actItem + 1))->_tag->GetObjectSize() << endl;
+
+			if( ((GObject*) ((int*) actItem + 1))->_tag->GetObjectSize() > 4 )
+			{
+				auto obj = (unsigned char*)(((GObject*) ((int*) actItem + 1)) + 1);
+				cout << "first 4 bytes" << endl;
+				for (int i = 0; i < sizeof(obj); ++i)
+				{
+					printf("%02x ", obj[i]);
+				}
+				cout << endl;
+			}
+
+			if (((GObject*) ((int*) actItem + 1))->_tag->GetOffsetList()->size() > 0)
+			{
+				cout << "Pointers: " << endl;
+
+				auto offsetList = ((GObject*) ((int*) actItem + 1))->_tag->GetOffsetList();
+
+				for each (auto offset in *offsetList)
+				{
+					auto vv = *((GObject**) ((char*) ((int*) actItem + 1) + sizeof(GObject) +offset)) ;
+
+					cout << vv << endl;
+				}
+			}
+
+
+			cout << endl << endl;
 		}
 
 		actItem = FindNextBlock(actItem);
